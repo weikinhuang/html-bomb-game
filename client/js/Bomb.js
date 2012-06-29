@@ -49,10 +49,15 @@ Classify("Game/Bomb", {
 		}
 	},
 	render : function() {
+		var self = this;
 		this.shouldExplode();
 		this.draw();
-		if (this.is_exploded && this.isCollision(this.player.x, this.player.y, this.player.width, this.player.height)) {
-			this.player.remove();
+		if (this.is_exploded) {
+			this.game.players.forEach(function(player) {
+				if(self.isCollision(player.x, player.y, player.width, player.height)) {
+					player.remove();
+				}
+			});
 		}
 	},
 	shouldExplode : function() {
