@@ -11,7 +11,7 @@ Classify("Game/Ball", {
 		this.context = this.canvas.getContext('2d');
 	},
 	appendTo : function(container) {
-		this.container = container.appendChild(this.getCanvas());
+		container.appendChild(this.getCanvas());
 	},
 	render : function() {
 		this.move();

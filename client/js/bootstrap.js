@@ -1,15 +1,15 @@
 (function(root) {
 	"use strict";
 
-	var includes = [ 
-		"jquery.min", 
-		"jcanvas", 
-		"classify.min", 
-		"classify-array.min", 
-		"FrameTimer", 
-		"Ball", 
-		"Bomb", 
-		"Game" 
+	var includes = [
+		"jquery.min",
+		"jcanvas",
+		"classify.min",
+		"classify-array.min",
+		"FrameTimer",
+		"Bomb",
+		"Player",
+		"Game"
 	];
 	var init = function() {
 		root.Game = Classify("Game");

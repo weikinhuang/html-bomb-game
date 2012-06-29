@@ -1,12 +1,7 @@
 Classify("Game/Game", "FrameTimer", {
 	fpsTimer : null,
-	x : 10,
-	y : 10,
-	dx : 4,
-	dy : 4,
-	r : 10,
-	boardHeight : 200,
-	boardWidth : 300,
+	boardHeight : 400,
+	boardWidth : 600,
 	__static_ : {
 		instance : null
 	},
@@ -20,13 +15,12 @@ Classify("Game/Game", "FrameTimer", {
 	init : function() {
 		this.fpsContainer = document.getElementById("fps");
 		this.container = document.getElementById("board");
-		this.ball = new Game.Ball(this.boardHeight, this.boardWidth);
-		this.ball.appendTo(this.container);
 		this.keys = {};
+		this.player = new Game.Player(this);
 		this.bindWindowEvents();
 	},
 	runLoop : function() {
-		this.ball.render();
+		this.player.render();
 	},
 	setWidth : function(width) {
 		this.canvas.width = width;
@@ -53,7 +47,6 @@ Classify("Game/Game", "FrameTimer", {
 			blurred = false;
 			self.start();
 		});
-
 
 		$(document).on("keydown", this.keyDown).on("keyup", this.keyUp);
 	},
