@@ -26,7 +26,10 @@ Classify("Game/Game", "FrameTimer", {
 		this.players.forEach(function(player){
 			player.render();
 		});
-		
+
+		this.bombs.forEach(function(bomb) {
+			bomb.render();
+		});
 	},
 	setWidth : function(width) {
 		this.canvas.width = width;
@@ -59,7 +62,7 @@ Classify("Game/Game", "FrameTimer", {
 		this.socket.on("init", function(uid){
 			self.player = new Game.Player(self, uid.uuid);
 			self.players.push(self.player);
-			
+
 		});
 
 		this.socket.on("new_player", function(uid){

@@ -4,6 +4,7 @@ Classify("Game/Player", {
 	pixelPerMs : 0.08,
 	width : 20,
 	height : 20,
+	isAlive : true,
 	init : function(game, uid) {
 		this.canvas = document.createElement("canvas");
 		$(this.canvas).addClass("player");
@@ -22,12 +23,11 @@ Classify("Game/Player", {
 		container.appendChild(this.canvas);
 	},
 	render : function() {
+		if (!this.isAlive) {
+			return;
+		}
 		this.move();
 		this.draw();
-		this.bombs.forEach(function(bomb) {
-			bomb.render();
-		});
-
 		this.dropBomb();
 	},
 	draw : function() {
@@ -52,8 +52,11 @@ Classify("Game/Player", {
 			this.x = Math.min(this.x + (this.game.delta * this.pixelPerMs), this.canvasWidth - this.width);
 		}
 	},
-	getCanvas : function() {
-		return this.canvas;
+	remove : function() {
+		this.$canvas.clearCanvas();
+		this.$canvas.remove();
+		this.isAlive = false;
+		console.log("Player is dead!");
 	},
 	dropBomb : function() {
 		if (!this.game.keys.space) {

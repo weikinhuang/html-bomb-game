@@ -51,6 +51,9 @@ Classify("Game/Bomb", {
 	render : function() {
 		this.shouldExplode();
 		this.draw();
+		if (this.is_exploded && this.isCollision(this.player.x, this.player.y, this.player.width, this.player.height)) {
+			this.player.remove();
+		}
 	},
 	shouldExplode : function() {
 		var self = this, time = new Date().getTime();
@@ -65,10 +68,7 @@ Classify("Game/Bomb", {
 		if (time >= this.drop_time + this.explode_in) {
 			this.is_exploded = true;
 			this.explode_time = time;
-			if (this.isCollision(this.player.x, this.player.y, this.player.width, this.player.height)) {
-				//this.game.stop();
-				console.log("game over stopping");
-			}
+
 		}
 		this.game.bombs.forEach(function(bomb) {
 			if (!bomb.is_exploded || bomb === self) {
