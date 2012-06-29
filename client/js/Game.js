@@ -57,7 +57,7 @@ Classify("Game/Game", "FrameTimer", {
 			self.start();
 		});
 
-		this.socket = io.connect("http://localhost:60000");
+		this.socket = io.connect();
 
 		this.socket.on("init", function(uid){
 			self.player = new Game.Player(self, uid.uuid);
