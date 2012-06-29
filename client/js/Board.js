@@ -26,26 +26,40 @@ Classify("Game/Board", {
 		this.height = height;
 		return this;
 	},
+	getSessionId : function() {
+		var sessid = Game.Cookie().getItem("sessionid");
+		if (!sessid) {
+			sessid = "x-" + (Math.random() * 1001) + (new Date().getTime());
+			Game.Cookie().setItem("sessionid", sessid);
+		}
+		return sessid;
+	},
 	bindEvents : function() {
 		var self = this;
 
-		this.game.socket.on("init", function(uid) {
-			self.player = new Game.Player(uid.uuid,self);
-			self.players.push(self.player);
-			self.players["u-" + uid.uuid] = self.player;
-		});
-/*
-		this.game.socket.on("new_player", function(uid) {
-			var player = new Game.Player(self, uid.uuid);
-			self.players.push(player);
-			self.players["u-" + uid.uuid] = player;
+		this.game.socket.emit("init", {
+			sessionId : this.getSessionId()
 		});
 
-		this.game.socket.on("player_disconnect", function(uid) {
+		this.game.socket.on("ready", function(data) {
+			console.log("ready", data);
+			self.player = new Game.Player(data.uuid, self);
+			self.players.push(self.player);
+			self.players["u-" + data.uuid] = self.player;
+		});
+
+		this.game.socket.on("playerConnect", function(data) {
+			console.log("playerConnect", data);
+			var player = new Game.Player(data.uuid, self);
+			self.players.push(player);
+			self.players["u-" + data.uuid] = player;
+		});
+
+		this.game.socket.on("playerDisconnect", function(data) {
+			console.log("playerDisconnect", data);
 			self.players.forEach(function(player, i) {
-				if (player.uid == uid.uuid) {
+				if (player.uid == data.uuid) {
 					player.remove();
-					self.players.splice(i, 1);
 				}
 			});
 		});
@@ -56,7 +70,12 @@ Classify("Game/Board", {
 		this.game.socket.on("keyup", function(data) {
 			self.players["u-" + data.uuid].keys = data.keys;
 		});
- */
+	},
+	sendState : function() {
+
+	},
+	__bind_updateState : function() {
+
 	},
 	__bind_keyDown : function(context, e) {
 		switch (e.which) {
@@ -84,7 +103,7 @@ Classify("Game/Board", {
 				this.player.dropBomb();
 				break;
 		}
-		//this.socket.emit("keydown", this.player.keys);
+		this.game.socket.emit("keydown", this.player.keys);
 	},
 	__bind_keyUp : function(context, e) {
 		switch (e.which) {
@@ -114,6 +133,6 @@ Classify("Game/Board", {
 			default:
 				break;
 		}
-		//this.socket.emit("keyup", this.keys);
+		this.game.socket.emit("keyup", this.keys);
 	}
 });

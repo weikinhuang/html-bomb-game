@@ -30,13 +30,13 @@ Classify("Game/Game", "FrameTimer", {
 				return;
 			}
 			blurred = true;
-			self.stop();
+			//self.stop();
 		}).on("focus", function() {
 			if (!blurred) {
 				return;
 			}
 			blurred = false;
-			self.start();
+			//self.start();
 		});
 		this.socket = io.connect();
 		$(document).on("keydown", this.board.keyDown).on("keyup", this.board.keyUp);

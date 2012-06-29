@@ -1,14 +1,8 @@
-(function(window) {
+(function() {
 	// general use variables: the storage namespace
 	var ns = "_sad4tfa_",
 	// the date to use to invalidate cookies
-	invalidate_cookie = "; expires=Thu, 01-Jan-1970 00:00:01 GMT",
-	// regex quick ref
-	scalar = /boolean|number|string/,
-	// minify optimizations
-	encodeURIComponent = window.encodeURIComponent, decodeURIComponent = window.decodeURIComponent,
-	// json minify optimizations
-	jsonParse = JSON.parse, jsonStringify = JSON.stringify;
+	invalidate_cookie = "; expires=Thu, 01-Jan-1970 00:00:01 GMT";
 
 	function addSeconds(date, seconds) {
 		date.setMilliseconds(date.getMilliseconds() + (seconds * 1000));
@@ -30,14 +24,14 @@
 			var r;
 			try {
 				r = new RegExp("(?:^|; )" + encodeURIComponent(ns + key) + "=([^;]*)").exec(document.cookie);
-				return r ? jsonParse(decodeURIComponent(r[1])) : null;
+				return r ? JSON.parse(decodeURIComponent(r[1])) : null;
 			} catch (e) {
 				return null;
 			}
 		},
 		setItem : function(key, value) {
 			var expire = this.expire > 0 ? "; expires=" + addSeconds(new Date(), this.expire).toUTCString() : "";
-			document.cookie = encodeURIComponent(ns + key) + "=" + encodeURIComponent(jsonStringify(value)) + expire;
+			document.cookie = encodeURIComponent(ns + key) + "=" + encodeURIComponent(JSON.stringify(value)) + expire;
 		},
 		removeItem : function(key) {
 			document.cookie = encodeURIComponent(ns + key) + "=null" + invalidate_cookie;
@@ -56,4 +50,4 @@
 		}
 	});
 
-})(window);
+})();

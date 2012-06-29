@@ -78,7 +78,7 @@ Classify("Game/Bomb", {
 		var self = this, time = new Date().getTime();
 		if (this.hasExploded) {
 			if (time >= (this.explodeTime + this.settleSpeed)) {
-				// this.$canvas.clearCanvas().remove();
+				this.$canvas.clearCanvas().remove();
 				this.player.removeBomb(this);
 			}
 			return;

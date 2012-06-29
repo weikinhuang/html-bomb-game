@@ -5,6 +5,8 @@ var url = require("url");
 var path = require("path");
 var io = require("socket.io");
 var Classify = require("./classify.min.js");
+// require the special array library
+require("./classify-array.min.js")(Classify);
 
 var Server = Classify.create({
 	__static_ : {
@@ -20,7 +22,7 @@ var Server = Classify.create({
 		var self = this;
 		this.server = http.createServer(function(request, response) {
 			var uri = url.parse(request.url).pathname, filename = path.join("client", uri);
-			console.log("Requesting: " + filename);
+			// console.log("Requesting: " + filename);
 			fs.exists(filename, function(exists) {
 				if (!exists) {
 					response.writeHead(404, {
@@ -56,67 +58,97 @@ var Server = Classify.create({
 			console.log("listening on port " + self.port);
 		});
 
-		var uuid = 0, sockets = [];
+		var uuid = 0, sockets = Classify.global.Array(), sessions = {};
 		io.listen(this.server, {
 			log : false,
 			transports : [ "websocket", "flashsocket", "htmlfile", "jsonp-polling" ],
 			"flash policy port" : this.port
 		}).sockets.on("connection", function(socket) {
-			var cur_id = ++uuid;
-			console.log("hi");
-			socket.uuid = cur_id;
-			sockets.push(socket);
+			var currentId = ++uuid;
+			console.log("Player connected: " + currentId);
+			socket.uuid = currentId;
+			socket.isActive = true;
 
-			socket.emit("init", {
-				uuid : cur_id
-			});
+			socket.on("init", function(data) {
+				if (sessions[data.sessionId]) {
+					sockets.remove(sessions[data.sessionId]);
+					sessions[data.sessionId].isActive = false;
+					sockets.forEach(function(s) {
+						// disconnect this user's previous sessions
+						s.emit("playerDisconnect", {
+							uuid : sessions[data.sessionId].uuid
+						});
+					});
+					delete sessions[data.sessionId];
+				}
 
-			socket.on("disconnect", function(){
-				sockets.forEach(function(s, i){
-					if(s === socket){
-						sockets.splice(i, 1);
-						return;
-					}
-					s.emit("player_disconnect" , {
-						uuid : cur_id
+				// store reference to user's current session
+				sessions[data.sessionId] = socket;
+				sockets.push(socket);
+				socket.emit("ready", {
+					uuid : currentId
+				});
+
+				socket.on("disconnect", function() {
+					console.log("disconnect: " + currentId);
+					sockets.remove(socket);
+					sockets.forEach(function(s, i) {
+						s.emit("playerDisconnect", {
+							uuid : currentId
+						});
 					});
 				});
-			});
 
-			socket.on("keyup", function(data){
-				var emit_data = {uuid:cur_id, keys: data};
-				sockets.forEach(function(s){
-					if(s === socket){
+				socket.on("keyup", function(data) {
+					console.log("keyup: " + currentId);
+					if (!socket.isActive) {
 						return;
 					}
-					s.emit("keyup", emit_data);
+					var emit_data = {
+						uuid : currentId,
+						keys : data
+					};
+					sockets.forEach(function(s) {
+						if (s === socket) {
+							return;
+						}
+						s.emit("keyup", emit_data);
+					});
 				});
-			});
 
-
-			socket.on("keydown", function(data){
-				var emit_data = {uuid:cur_id, keys: data};
-				sockets.forEach(function(s){
-					if(s === socket){
+				socket.on("keydown", function(data) {
+					console.log("keydown: " + currentId);
+					if (!socket.isActive) {
 						return;
 					}
-					s.emit("keyup", emit_data);
+					var emit_data = {
+						uuid : currentId,
+						keys : data
+					};
+					sockets.forEach(function(s) {
+						if (s === socket) {
+							return;
+						}
+						s.emit("keyup", emit_data);
+					});
+
 				});
 
-			});
+				sockets.forEach(function(s) {
+					if (s === socket || !s.isActive) {
+						return;
+					}
+					// tell all other players that this player has connected
+					s.emit("playerConnect", {
+						uuid : currentId
+					});
 
-			sockets.forEach(function(s){
-				if(s === socket){
-					return;
-				}
-				s.emit("new_player" , {
-					uuid : cur_id
+					// tell current player about the currently connected players
+					socket.emit("playerConnect", {
+						uuid : s.uuid
+					});
+
 				});
-
-				socket.emit("new_player", {
-					uuid: s.uuid
-				});
-
 			});
 		});
 
