@@ -10,8 +10,15 @@ Classify("Game/Ball", {
 		this.canvas.width = boardWidth;
 		this.context = this.canvas.getContext('2d');
 	},
-
-	draw : function(){
+	appendTo : function(container) {
+		this.container = container.appendChild(this.getCanvas());
+	},
+	render : function() {
+		this.ball.move();
+		this.ball.clear();
+		this.ball.draw();
+	},
+	draw : function() {
 		this.context.fillStyle = 'rgb(0, 0, 0)';
 		this.context.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
 		this.context.closePath();
@@ -30,8 +37,8 @@ Classify("Game/Ball", {
 	},
 	clear : function() {
 		this.canvas.width = this.canvas.width;
-	},   
-	getCanvas : function(){
+	},
+	getCanvas : function() {
 		return this.canvas;
 	}
-})
+});

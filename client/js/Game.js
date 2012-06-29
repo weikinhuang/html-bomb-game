@@ -19,15 +19,14 @@ Classify("Game/Game", "FrameTimer", {
 	},
 	init : function() {
 		this.fpsContainer = document.getElementById("fps");
+		this.container = document.getElementById("board");
 		this.ball = new Game.Ball(this.boardHeight, this.boardWidth);
-		this.container = document.getElementById("board").appendChild(this.ball.getCanvas());
+		this.ball.appendTo(this.container);
 		this.keys = {};
 		this.bindWindowEvents();
 	},
 	runLoop : function() {
-		this.ball.move();
-		this.ball.clear();
-		this.ball.draw();
+		this.ball.render();
 	},
 	setWidth : function(width) {
 		this.canvas.width = width;
