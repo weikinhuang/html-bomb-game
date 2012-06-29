@@ -69,6 +69,15 @@ Classify("Game/Game", "FrameTimer", {
 			self.players.push(new Game.Player(self, uid.uuid));
 		});
 
+		this.socket.on("player_disconnect", function(uid){
+			self.players.forEach(function(player, i){
+				if(player.uid == uid.uuid){
+					player.remove();
+					self.players.splice(i, 1);
+				}
+			});
+		});
+
 		$(document).on("keydown", this.keyDown).on("keyup", this.keyUp);
 	},
 	__bind_keyDown : function(context, e) {

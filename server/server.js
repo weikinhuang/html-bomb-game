@@ -62,12 +62,25 @@ var Server = Classify.create({
 			transports : [ "websocket", "flashsocket", "htmlfile", "jsonp-polling" ],
 			"flash policy port" : this.port
 		}).sockets.on("connection", function(socket) {
+			var cur_id = ++uuid;
 			console.log("hi");
-
+			socket.uuid = cur_id;
 			sockets.push(socket);
 
 			socket.emit("init", {
-				uuid : ++uuid
+				uuid : cur_id
+			});
+
+			socket.on("disconnect", function(){
+				sockets.forEach(function(s, i){
+					if(s === socket){
+						sockets.splice(i, 1);
+						return;
+					}
+					s.emit("player_disconnect" , {
+						uuid : cur_id
+					});
+				});
 			});
 
 			sockets.forEach(function(s){
@@ -75,7 +88,11 @@ var Server = Classify.create({
 					return;
 				}
 				s.emit("new_player" , {
-					uuid : uuid
+					uuid : cur_id
+				});
+
+				socket.emit("new_player", {
+					uuid: s.uuid
 				});
 
 			});
