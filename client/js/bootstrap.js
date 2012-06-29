@@ -2,6 +2,7 @@
 	"use strict";
 
 	var includes = [
+		"/socket.io/socket.io",
 		"jquery.min",
 		"jcanvas",
 		"classify.min",
@@ -35,7 +36,7 @@
 		html.className = html.className + " progress-0";
 		// load each script, but execute in series
 		includes.join("|").replace(/([^\|]+)(?:\||$)/g, function(match, script) {
-			var name = /^\//.test(script) ? script : ("js/" + script);
+			var name = /^\//.test(script) ? script : ("/js/" + script);
 			lab.script(name + ".js").wait(wait);
 		});
 		// final function for page ready

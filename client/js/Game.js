@@ -15,13 +15,18 @@ Classify("Game/Game", "FrameTimer", {
 	init : function() {
 		this.fpsContainer = document.getElementById("fps");
 		this.container = document.getElementById("board");
+		this.players = [];
 		this.keys = {};
 		this.bombs = [];
 		this.player = new Game.Player(this);
 		this.bindWindowEvents();
 	},
 	runLoop : function() {
-		this.player.render();
+		console.log(this.players);
+		this.players.forEach(function(player){
+			player.render();
+		});
+		
 	},
 	setWidth : function(width) {
 		this.canvas.width = width;
@@ -47,6 +52,18 @@ Classify("Game/Game", "FrameTimer", {
 			}
 			blurred = false;
 			self.start();
+		});
+
+		this.socket = io.connect("http://localhost:60000");
+
+		this.socket.on("init", function(uid){
+			self.player = new Game.Player(self, uid.uuid);
+			self.players.push(self.player);
+			
+		});
+
+		this.socket.on("new_player", function(uid){
+			self.players.push(new Game.Player(self, uid.uuid));
 		});
 
 		$(document).on("keydown", this.keyDown).on("keyup", this.keyUp);

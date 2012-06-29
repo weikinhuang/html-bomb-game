@@ -3,7 +3,7 @@ var fs = require("fs");
 var http = require("http");
 var url = require("url");
 var path = require("path");
-//var io = require("socket.io");
+var io = require("socket.io");
 var Classify = require("./classify.min.js");
 
 var Server = Classify.create({
@@ -55,7 +55,7 @@ var Server = Classify.create({
 		}).listen(this.port, function() {
 			console.log("listening on port " + self.port);
 		});
-/*
+
 		var uuid = 0, sockets = [];
 		io.listen(this.server, {
 			log : false,
@@ -69,8 +69,18 @@ var Server = Classify.create({
 			socket.emit("init", {
 				uuid : ++uuid
 			});
+
+			sockets.forEach(function(s){
+				if(s === socket){
+					return;
+				}
+				s.emit("new_player" , {
+					uuid : uuid
+				});
+
+			});
 		});
-*/
+
 		return this;
 	}
 });

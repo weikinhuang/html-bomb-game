@@ -4,7 +4,7 @@ Classify("Game/Player", {
 	pixelPerMs : 0.08,
 	width : 20,
 	height : 20,
-	init : function(game) {
+	init : function(game, uid) {
 		this.canvas = document.createElement("canvas");
 		$(this.canvas).addClass("player");
 		this.canvasHeight = game.boardHeight;
@@ -16,6 +16,7 @@ Classify("Game/Player", {
 		this.appendTo(game.container);
 		this.game = game;
 		this.bombs = [];
+		this.uid = uid;
 	},
 	appendTo : function(container) {
 		container.appendChild(this.canvas);
