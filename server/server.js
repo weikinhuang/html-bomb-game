@@ -83,6 +83,28 @@ var Server = Classify.create({
 				});
 			});
 
+			socket.on("keyup", function(data){
+				var emit_data = {uuid:cur_id, keys: data};
+				sockets.forEach(function(s){
+					if(s === socket){
+						return;
+					}
+					s.emit("keyup", emit_data);
+				});
+			});
+
+
+			socket.on("keydown", function(data){
+				var emit_data = {uuid:cur_id, keys: data};
+				sockets.forEach(function(s){
+					if(s === socket){
+						return;
+					}
+					s.emit("keyup", emit_data);
+				});
+
+			});
+
 			sockets.forEach(function(s){
 				if(s === socket){
 					return;
