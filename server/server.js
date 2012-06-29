@@ -3,6 +3,7 @@ var fs = require("fs");
 var http = require("http");
 var url = require("url");
 var path = require("path");
+//var io = require("socket.io");
 var Classify = require("./classify.min.js");
 
 var Server = Classify.create({
@@ -14,12 +15,13 @@ var Server = Classify.create({
 			html : "text/html"
 		}
 	},
+	port : 60000,
 	init : function() {
 		var self = this;
 		this.server = http.createServer(function(request, response) {
 			var uri = url.parse(request.url).pathname, filename = path.join("client", uri);
 			console.log("Requesting: " + filename);
-			path.exists(filename, function(exists) {
+			fs.exists(filename, function(exists) {
 				if (!exists) {
 					response.writeHead(404, {
 						"Content-Type" : "text/plain"
@@ -50,16 +52,23 @@ var Server = Classify.create({
 					response.end();
 				});
 			});
-		}).listen(60000, function() {
-			console.log("listening on port 60000");
+		}).listen(this.port, function() {
+			console.log("listening on port " + self.port);
 		});
 /*
+		var uuid = 0, sockets = [];
 		io.listen(this.server, {
 			log : false,
 			transports : [ "websocket", "flashsocket", "htmlfile", "jsonp-polling" ],
-			"flash policy port" : parseInt(this.build.getOption("browserstack.port") || 80, 10)
+			"flash policy port" : this.port
 		}).sockets.on("connection", function(socket) {
+			console.log("hi");
 
+			sockets.push(socket);
+
+			socket.emit("init", {
+				uuid : ++uuid
+			});
 		});
 */
 		return this;
