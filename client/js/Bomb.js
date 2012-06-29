@@ -4,10 +4,10 @@ Classify("Game/Bomb", {
 	explode_in : 2000,
 	settle_time : 500,
 	is_exploded : false,
-	explosion_width: 100,
-	explosion_height: 100,
-	width: 10,
-	height: 10,
+	explosion_width : 100,
+	explosion_height : 100,
+	width : 10,
+	height : 10,
 
 	init : function(game, player) {
 		this.drop_time = new Date().getTime();
@@ -53,7 +53,7 @@ Classify("Game/Bomb", {
 		this.draw();
 	},
 	shouldExplode : function() {
-		var time = new Date().getTime();
+		var self = this, time = new Date().getTime();
 		if (this.is_exploded) {
 			if (time >= (this.explode_time + this.settle_time)) {
 				this.$canvas.clearCanvas();
@@ -65,17 +65,30 @@ Classify("Game/Bomb", {
 		if (time >= this.drop_time + this.explode_in) {
 			this.is_exploded = true;
 			this.explode_time = time;
-			this.isCollision(this.player.x, this.player.y, this.player.width, this.player.height);
-		}
-	},
-	isCollision : function(x, y, width, height){
-		var half_width = this.explosion_width/2;
-		var half_height = this.explosion_height/2;
-		if(x < (this.x + half_width) && (x >= this.x)  || x > (this.x - half_width) && (x < this.x)){
-				if(y < (this.y + half_height) && (y >= this.y) || y > (this.y - half_height) && (y < this.y) ){
-					console.log("game over stopping");
-					// this.game.stop();
-				}
+			if (this.isCollision(this.player.x, this.player.y, this.player.width, this.player.height)) {
+				//this.game.stop();
+				console.log("game over stopping");
 			}
+		}
+		this.game.bombs.forEach(function(bomb) {
+			if (!bomb.is_exploded || bomb === self) {
+				return;
+			}
+			if (bomb.isCollision(self.x - 5, self.y - 5, self.width, self.height)) {
+				self.is_exploded = true;
+				self.explode_time = time;
+			}
+		});
+
+	},
+	isCollision : function(x, y, width, height) {
+		var half_width = this.explosion_width / 2;
+		var half_height = this.explosion_height / 2;
+		if (x < (this.x + half_width) && (x >= this.x) || x > (this.x - half_width) && (x < this.x)) {
+			if (y < (this.y + half_height) && (y >= this.y) || y > (this.y - half_height) && (y < this.y)) {
+				return true;
+			}
+		}
+		return false;
 	}
 });

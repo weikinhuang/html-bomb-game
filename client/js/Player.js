@@ -58,15 +58,19 @@ Classify("Game/Player", {
 		if (!this.game.keys.space) {
 			return;
 		}
-
 		this.game.keys.space = false;
-		this.bombs.push(new Game.Bomb(this.game, this));
-
+		var bomb = new Game.Bomb(this.game, this);
+		this.bombs.push(bomb);
+		this.game.bombs.push(bomb);
 	},
 	removeBomb : function(bomb) {
 		var index = this.bombs.indexOf(bomb);
 		if (index > -1) {
 			this.bombs.splice(index, 1);
+		}
+		var gameIndex = this.game.bombs.indexOf(bomb);
+		if (gameIndex > -1) {
+			this.game.bombs.splice(gameIndex, 1);
 		}
 	}
 });

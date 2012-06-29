@@ -16,6 +16,7 @@ Classify("Game/Game", "FrameTimer", {
 		this.fpsContainer = document.getElementById("fps");
 		this.container = document.getElementById("board");
 		this.keys = {};
+		this.bombs = [];
 		this.player = new Game.Player(this);
 		this.bindWindowEvents();
 	},
