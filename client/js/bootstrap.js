@@ -8,6 +8,7 @@
 		"classify.min",
 		"classify-array.min",
 		"FrameTimer",
+		"Cookie",
 		"Bomb",
 		"Player",
 		"Game"
