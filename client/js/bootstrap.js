@@ -1,7 +1,7 @@
 (function(root) {
 	"use strict";
 
-	var includes = [ "jquery.min", "classify.min", "classify-array.min", "FrameTimer", "Ball", "Game" ];
+	var includes = [ "jquery.min", "jcanvas", "classify.min", "classify-array.min", "FrameTimer", "Ball", "Game" ];
 	var init = function() {
 		root.Game = Classify("Game");
 		root.Game.Game().start().startFpsLog();
