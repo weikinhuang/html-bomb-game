@@ -6,6 +6,7 @@ Classify("Game/Player", {
 	height : 20,
 	init : function(game) {
 		this.canvas = document.createElement("canvas");
+		$(this.canvas).addClass("player");
 		this.canvasHeight = game.boardHeight;
 		this.canvasWidth = game.boardWidth;
 		this.canvas.height = game.boardHeight;
