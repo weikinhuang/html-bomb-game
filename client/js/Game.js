@@ -24,7 +24,7 @@ Classify("Game/Game", "FrameTimer", {
 		this.container = document.getElementById("board").appendChild(this.canvas);
 		this.fpsContainer = document.getElementById("fps");
 		this.ball = this.canvas.getContext('2d');
-		this.keyboard = {};
+		this.keys = {};
 		this.bindWindowEvents();
 	},
 	runLoop : function() {
@@ -74,6 +74,53 @@ Classify("Game/Game", "FrameTimer", {
 			blurred = false;
 			self.start();
 		});
+
+		$(document).on("keydown", this.keyDown).on("keyup", this.keyUp);
+	},
+	__bind_keyDown : function(context, e) {
+		switch (e.which) {
+			case 38: // up
+			case 87: // w
+				this.keys.up = true;
+				break;
+			case 40: // down
+			case 83: // s
+				this.keys.down = true;
+				break;
+			case 37: // left
+			case 65: // a
+				this.keys.left = true;
+				break;
+			case 39: // right
+			case 68: // d
+				this.keys.right = true;
+				break;
+		}
+	},
+	__bind_keyUp : function(context, e) {
+		switch (e.which) {
+			case 38: // up
+			case 87: // w
+				this.keys.up = false;
+				break;
+			case 40: // down
+			case 83: // s
+				this.keys.down = false;
+				break;
+			case 37: // left
+			case 65: // a
+				this.keys.left = false;
+				break;
+			case 39: // right
+			case 68: // d
+				this.keys.right = false;
+				break;
+			case 27: // esc
+				this.pause();
+				break;
+			default:
+				break;
+		}
 	},
 	startFpsLog : function() {
 		var self = this, t = 0;
