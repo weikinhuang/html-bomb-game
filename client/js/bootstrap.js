@@ -1,9 +1,9 @@
 (function(root) {
 	"use strict";
 
-	var includes = [ "js/jquery.min.js", "js/classify.min.js", "js/classify-array.min.js" ];
+	var includes = [ "jquery.min", "classify.min", "classify-array.min", "FrameTimer", "Game" ];
 	var init = function() {
-		console.log("ready");
+		Classify("Game").Game().start().startFpsLog();
 	};
 
 	// make sure the core of the javascript files loaded
@@ -25,7 +25,7 @@
 		html.className = html.className + " progress-0";
 		// load each script, but execute in series
 		includes.join("|").replace(/([^\|]+)(?:\||$)/g, function(match, script) {
-			lab.script(script).wait(wait);
+			lab.script("js/" + script + ".js").wait(wait);
 		});
 		// final function for page ready
 		lab.wait(function() {

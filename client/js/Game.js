@@ -74,14 +74,6 @@ Classify("Game/Game", "FrameTimer", {
 			blurred = false;
 			self.start();
 		});
-
-		this.onKeyup = new Classify("Game").Keyboard.Keyup(window);
-		this.onKeydown = new Classify("Game").Keyboard.Keydown(window);
-		this.onKeypress = new Classify("Game").Keyboard.Keypress(window);
-
-		this.onKeypress.bind("p", function() {
-			self.pause();
-		});
 	},
 	startFpsLog : function() {
 		var self = this, t = 0;
