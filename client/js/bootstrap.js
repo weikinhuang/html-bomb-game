@@ -8,14 +8,15 @@
 		"classify.min",
 		"classify-array.min",
 		"FrameTimer",
+		"Game",
+		"Board",
 		"Cookie",
 		"Bomb",
-		"Player",
-		"Game"
+		"Player"
 	];
 	var init = function() {
 		root.Game = Classify("Game");
-		root.Game.Game().start().startFpsLog();
+		root.Game.Game().startFpsLog();
 	};
 
 	// make sure the core of the javascript files loaded

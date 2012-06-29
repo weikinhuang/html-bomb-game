@@ -1,99 +1,115 @@
 Classify("Game/Bomb", {
-	drop_time : 0,
-	explode_time : 0,
-	explode_in : 2000,
-	settle_time : 500,
-	is_exploded : false,
-	explosion_width : 100,
-	explosion_height : 100,
-	width : 10,
-	height : 10,
+	dropTime : 0,
+	explodeTime : 0,
+	explodeDelay : 2000,
+	settleSpeed : 500,
+	hasExploded : false,
+	redraw : false,
 
-	init : function(game, player) {
-		this.drop_time = new Date().getTime();
-		this.canvas = document.createElement("canvas");
-		this.canvasHeight = game.boardHeight;
-		this.canvasWidth = game.boardWidth;
-		$(this.canvas).addClass("bomb");
-		this.canvas.height = game.boardHeight;
-		this.canvas.width = game.boardWidth;
-		this.$canvas = $(this.canvas);
-		this.context = this.canvas.getContext('2d');
-		game.container.appendChild(this.canvas);
-		this.game = game;
+	width : 0,
+	height : 0,
+	unExplodedWidth : 10,
+	unExplodedHeight : 10,
+	explosionWidth : 100,
+	explosionHeight : 100,
+
+	x : 0,
+	y : 0,
+	centerX : 0,
+	centerY : 0,
+
+	init : function(player, board) {
 		this.player = player;
-		this.x = player.x;
-		this.y = player.y;
+		this.board = board;
+		this.canvas = document.createElement("canvas");
+		this.canvas.height = board.height;
+		this.canvas.width = board.width;
+		this.$canvas = $(this.canvas).addClass("bomb");
+		board.container.appendChild(this.canvas);
+		this.dropTime = new Date().getTime();
+		this.setInitialPosition();
+		this.redraw = true;
+		this.width = this.unExplodedWidth;
+		this.height = this.unExplodedHeight;
+		this.x = this.centerX - Math.round(this.unExplodedWidth / 2);
+		this.y = this.centerY - Math.round(this.unExplodedHeight / 2);
 	},
-	draw : function() {
-		var self = this;
-		this.$canvas.clearCanvas();
-		if (this.is_exploded) {
-			this.$canvas.drawRect({
-				fillStyle : "red",
-				x : self.x,
-				y : self.y,
-				width : self.explosion_width,
-				height : self.explosion_height
-			});
-
-			this.width = self.explosion_width;
-			this.height = self.explosion_height;
-		} else {
-			this.$canvas.drawArc({
-				fillStyle : "darkblue",
-				x : self.x,
-				y : self.y,
-				radius : self.width
-			});
-		}
+	setInitialPosition : function() {
+		this.centerX = (this.player.x + Math.round(this.player.width / 2));
+		this.centerY = (this.player.y + Math.round(this.player.height / 2));
 	},
 	render : function() {
 		var self = this;
 		this.shouldExplode();
 		this.draw();
-		if (this.is_exploded) {
-			this.game.players.forEach(function(player) {
-				if(self.isCollision(player.x, player.y, player.width, player.height)) {
+		if (this.hasExploded) {
+			this.board.players.forEach(function(player) {
+				if (self.isCollision(player.x, player.y, player.width, player.height)) {
 					player.remove();
 				}
 			});
 		}
 	},
+	draw : function() {
+		if (!this.redraw) {
+			return;
+		}
+		this.redraw = false;
+		this.$canvas.clearCanvas();
+		if (this.hasExploded) {
+			this.$canvas.drawRect({
+				fillStyle : "red",
+				x : this.x,
+				y : this.y,
+				width : this.explosionWidth,
+				height : this.explosionHeight,
+				fromCenter : false
+			});
+		} else {
+			this.$canvas.drawArc({
+				fillStyle : "darkblue",
+				x : this.centerX,
+				y : this.centerY,
+				radius : this.unExplodedWidth
+			});
+		}
+	},
 	shouldExplode : function() {
 		var self = this, time = new Date().getTime();
-		if (this.is_exploded) {
-			if (time >= (this.explode_time + this.settle_time)) {
-				this.$canvas.clearCanvas();
+		if (this.hasExploded) {
+			if (time >= (this.explodeTime + this.settleSpeed)) {
+				// this.$canvas.clearCanvas().remove();
 				this.player.removeBomb(this);
-				this.$canvas.remove();
 			}
 			return;
 		}
-		if (time >= this.drop_time + this.explode_in) {
-			this.is_exploded = true;
-			this.explode_time = time;
-
+		if (time >= this.dropTime + this.explodeDelay) {
+			this.explode(time);
+			return;
 		}
-		this.game.bombs.forEach(function(bomb) {
-			if (!bomb.is_exploded || bomb === self) {
+		this.board.bombs.some(function(bomb) {
+			if (!bomb.hasExploded || bomb === self) {
 				return;
 			}
-			if (bomb.isCollision(self.x - 5, self.y - 5, self.width, self.height)) {
-				self.is_exploded = true;
-				self.explode_time = time;
-			}
-		});
-
-	},
-	isCollision : function(x, y, width, height) {
-		var half_width = this.explosion_width / 2;
-		var half_height = this.explosion_height / 2;
-		if (x < (this.x + half_width) && (x >= this.x) || x > (this.x - half_width) && (x < this.x)) {
-			if (y < (this.y + half_height) && (y >= this.y) || y > (this.y - half_height) && (y < this.y)) {
+			if (bomb.isCollision(self.x, self.y, self.width, self.height)) {
+				self.explode(time);
 				return true;
 			}
-		}
-		return false;
+		});
+	},
+	explode : function(time) {
+		this.hasExploded = true;
+		this.explodeTime = time;
+		this.redraw = true;
+		this.width = this.explosionWidth;
+		this.height = this.explosionHeight;
+		this.x = this.x + Math.round(this.unExplodedWidth / 2) - Math.round(this.explosionWidth / 2);
+		this.y = this.y + Math.round(this.unExplodedHeight / 2) - Math.round(this.explosionHeight / 2);
+	},
+	isCollision : function(x, y, w, h) {
+		var collideX = (x >= this.x && x <= (this.x + this.width)) || ((x + w) > this.x && (x + w) <= (this.x + this.width));
+		var collideY = (y >= this.y && y <= (this.y + this.height)) || ((y + w) > this.y && (y + w) <= (this.y + this.height));
+
+		return collideX && collideY;
 	}
 });

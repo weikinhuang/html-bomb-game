@@ -5,23 +5,17 @@ Classify("Game/Player", {
 	width : 20,
 	height : 20,
 	isAlive : true,
-	init : function(game, uid) {
-		this.canvas = document.createElement("canvas");
-		$(this.canvas).addClass("player");
-		this.canvasHeight = game.boardHeight;
-		this.canvasWidth = game.boardWidth;
-		this.canvas.height = game.boardHeight;
-		this.canvas.width = game.boardWidth;
-		this.$canvas = $(this.canvas);
-		this.context = this.canvas.getContext('2d');
-		this.appendTo(game.container);
-		this.game = game;
-		this.bombs = [];
+	uid : 0,
+	init : function(uid, board) {
 		this.uid = uid;
+		this.board = board;
+		this.canvas = document.createElement("canvas");
+		this.canvas.height = board.height;
+		this.canvas.width = board.width;
+		this.$canvas = $(this.canvas).addClass("player");
+		board.container.appendChild(this.canvas);
+		this.bombs = Classify.global.Array();
 		this.keys = {};
-	},
-	appendTo : function(container) {
-		container.appendChild(this.canvas);
 	},
 	render : function() {
 		if (!this.isAlive) {
@@ -29,7 +23,7 @@ Classify("Game/Player", {
 		}
 		this.move();
 		this.draw();
-		this.dropBomb();
+		this.shouldDropBomb();
 	},
 	draw : function() {
 		this.$canvas.clearCanvas().drawRect({
@@ -43,39 +37,37 @@ Classify("Game/Player", {
 	},
 	move : function() {
 		if (this.keys.up) {
-			this.y = Math.max(this.y - (this.game.delta * this.pixelPerMs), 0);
+			this.y = Math.max(this.y - (this.board.game.delta * this.pixelPerMs), 0);
 		} else if (this.keys.down) {
-			this.y = Math.min(this.y + (this.game.delta * this.pixelPerMs), this.canvasHeight - this.height);
+			this.y = Math.min(this.y + (this.board.game.delta * this.pixelPerMs), this.board.height - this.height);
 		}
 		if (this.keys.left) {
-			this.x = Math.max(this.x - (this.game.delta * this.pixelPerMs), 0);
+			this.x = Math.max(this.x - (this.board.game.delta * this.pixelPerMs), 0);
 		} else if (this.keys.right) {
-			this.x = Math.min(this.x + (this.game.delta * this.pixelPerMs), this.canvasWidth - this.width);
+			this.x = Math.min(this.x + (this.board.game.delta * this.pixelPerMs), this.board.width - this.width);
 		}
 	},
 	remove : function() {
-		this.$canvas.clearCanvas();
-		this.$canvas.remove();
+		this.$canvas.clearCanvas().remove();
 		this.isAlive = false;
-		console.log("Player is dead!");
+		this.board.players.remove(this);
+		console.log("Player " + this.uid + " is dead!");
 	},
 	dropBomb : function() {
-		if (!this.keys.space) {
+		this.bombActive = true;
+		return this;
+	},
+	shouldDropBomb : function() {
+		if (!this.bombActive) {
 			return;
 		}
-		this.keys.space = false;
-		var bomb = new Game.Bomb(this.game, this);
+		this.bombActive = false;
+		var bomb = new Game.Bomb(this, this.board);
 		this.bombs.push(bomb);
-		this.game.bombs.push(bomb);
+		this.board.bombs.push(bomb);
 	},
 	removeBomb : function(bomb) {
-		var index = this.bombs.indexOf(bomb);
-		if (index > -1) {
-			this.bombs.splice(index, 1);
-		}
-		var gameIndex = this.game.bombs.indexOf(bomb);
-		if (gameIndex > -1) {
-			this.game.bombs.splice(gameIndex, 1);
-		}
+		this.bombs.remove(bomb);
+		this.board.bombs.remove(bomb);
 	}
 });
