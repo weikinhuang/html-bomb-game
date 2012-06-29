@@ -17,12 +17,10 @@ Classify("Game/Game", "FrameTimer", {
 		this.container = document.getElementById("board");
 		this.keys = {};
 		this.player = new Game.Player(this);
-		this.bomb = new Game.Bomb(this);
 		this.bindWindowEvents();
 	},
 	runLoop : function() {
 		this.player.render();
-		this.bomb.render();
 	},
 	setWidth : function(width) {
 		this.canvas.width = width;
@@ -69,6 +67,9 @@ Classify("Game/Game", "FrameTimer", {
 			case 39: // right
 			case 68: // d
 				this.keys.right = true;
+				break;
+			case 32: //space
+				this.keys.space = true;
 				break;
 		}
 	},

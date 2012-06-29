@@ -3,27 +3,32 @@ Classify("Game/Bomb", {
 	explode_in : 5000,
 	is_exploded : false,
 	
-	init : function(game) {
+	init : function(game, x, y) {
 		this.drop_time = new Date().getTime();
 		this.canvas = document.createElement("canvas");
 		this.canvas.height = game.boardHeight;
 		this.canvas.width = game.boardWidth;
 		game.container.appendChild(this.canvas);
+		this.x = x;
+		this.y = y;
 	
 	},
 
 	draw : function(){
+		var self = this;
 		if(this.is_exploded){
 			$(this.canvas).drawRect({
 				fillStyle: "red",
-				x: 20, y: 20,
+				x: self.x, 
+				y: self.y,
 				width: 100,
 				height: 100
 			});	
 		}else{
 			$(this.canvas).drawArc({
 				fillStyle: "darkblue",
-				x: 20, y: 20,
+				x: self.x, 
+				y: self.y,
 				radius: 10
 			});
 		}			
@@ -39,6 +44,7 @@ Classify("Game/Bomb", {
 		this.canvas.width = this.canvas.width;
 	},
 	shouldExplode : function(){
+console.log(this.is_exploded, "exploded");		
 		if(this.is_exploded){
 			return;
 		}

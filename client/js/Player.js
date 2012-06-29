@@ -14,6 +14,7 @@ Classify("Game/Player", {
 		this.context = this.canvas.getContext('2d');
 		this.appendTo(game.container);
 		this.game = game;
+		this.bombs = [];
 	},
 	appendTo : function(container) {
 		container.appendChild(this.canvas);
@@ -21,6 +22,11 @@ Classify("Game/Player", {
 	render : function() {
 		this.move();
 		this.draw();
+		this.bombs.forEach(function(bomb){
+			bomb.render();
+		});
+
+		this.dropBomb();
 	},
 	draw : function() {
 		this.$canvas.clearCanvas().drawRect({
@@ -46,5 +52,14 @@ Classify("Game/Player", {
 	},
 	getCanvas : function() {
 		return this.canvas;
+	},
+	dropBomb : function(){
+		if(!this.game.keys.space){
+			return;
+		}
+
+		this.game.keys.space = false;
+		this.bombs.push(new Game.Bomb(this.game, this.x, this.y));
+
 	}
 });
