@@ -1,9 +1,10 @@
 (function(root) {
 	"use strict";
 
-	var includes = [ "jquery.min", "classify.min", "classify-array.min", "FrameTimer", "Game" ];
+	var includes = [ "jquery.min", "classify.min", "classify-array.min", "FrameTimer", "Ball", "Game" ];
 	var init = function() {
-		Classify("Game").Game().start().startFpsLog();
+		root.Game = Classify("Game");
+		root.Game.Game().start().startFpsLog();
 	};
 
 	// make sure the core of the javascript files loaded

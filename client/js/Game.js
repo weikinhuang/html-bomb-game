@@ -18,36 +18,16 @@ Classify("Game/Game", "FrameTimer", {
 		return this.instance;
 	},
 	init : function() {
-		this.canvas = document.createElement("canvas");
-		this.canvas.height = this.boardHeight;
-		this.canvas.width = this.boardWidth;
-		this.container = document.getElementById("board").appendChild(this.canvas);
 		this.fpsContainer = document.getElementById("fps");
-		this.ball = this.canvas.getContext('2d');
+		this.ball = new Game.Ball(this.boardHeight, this.boardWidth);
+		this.container = document.getElementById("board").appendChild(this.ball.getCanvas());
 		this.keys = {};
 		this.bindWindowEvents();
 	},
 	runLoop : function() {
-		this.move();
-		this.clear();
-		this.ball.fillStyle = 'rgb(0, 0, 0)';
-		this.ball.arc(this.x, this.y, this.r, 0, Math.PI * 2, true);
-		this.ball.closePath();
-		this.ball.fill();
-		this.ball.save();
-	},
-	move : function() {
-		if ((this.x - this.r) < 0 || (this.x + this.r) > this.canvas.width) {
-			this.dx = -1 * this.dx;
-		}
-		if ((this.y - this.r) < 0 || (this.y + this.r) > this.canvas.height) {
-			this.dy = -1 * this.dy;
-		}
-		this.x += this.dx;
-		this.y += this.dy;
-	},
-	clear : function() {
-		this.canvas.width = this.boardWidth;
+		this.ball.move();
+		this.ball.clear();
+		this.ball.draw();
 	},
 	setWidth : function(width) {
 		this.canvas.width = width;
@@ -74,6 +54,7 @@ Classify("Game/Game", "FrameTimer", {
 			blurred = false;
 			self.start();
 		});
+
 
 		$(document).on("keydown", this.keyDown).on("keyup", this.keyUp);
 	},
@@ -121,6 +102,7 @@ Classify("Game/Game", "FrameTimer", {
 			default:
 				break;
 		}
+
 	},
 	startFpsLog : function() {
 		var self = this, t = 0;
