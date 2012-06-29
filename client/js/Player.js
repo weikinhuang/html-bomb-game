@@ -22,7 +22,7 @@ Classify("Game/Player", {
 	render : function() {
 		this.move();
 		this.draw();
-		this.bombs.forEach(function(bomb){
+		this.bombs.forEach(function(bomb) {
 			bomb.render();
 		});
 
@@ -53,13 +53,19 @@ Classify("Game/Player", {
 	getCanvas : function() {
 		return this.canvas;
 	},
-	dropBomb : function(){
-		if(!this.game.keys.space){
+	dropBomb : function() {
+		if (!this.game.keys.space) {
 			return;
 		}
 
 		this.game.keys.space = false;
-		this.bombs.push(new Game.Bomb(this.game, this.x, this.y));
+		this.bombs.push(new Game.Bomb(this.game, this));
 
+	},
+	removeBomb : function(bomb) {
+		var index = this.bombs.indexOf(bomb);
+		if (index > -1) {
+			this.bombs.splice(index, 1);
+		}
 	}
 });
