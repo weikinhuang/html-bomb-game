@@ -14,9 +14,9 @@ Classify("Game/Ball", {
 		this.container = container.appendChild(this.getCanvas());
 	},
 	render : function() {
-		this.ball.move();
-		this.ball.clear();
-		this.ball.draw();
+		this.move();
+		this.clear();
+		this.draw();
 	},
 	draw : function() {
 		this.context.fillStyle = 'rgb(0, 0, 0)';
