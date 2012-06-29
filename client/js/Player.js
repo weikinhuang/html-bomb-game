@@ -18,6 +18,7 @@ Classify("Game/Player", {
 		this.game = game;
 		this.bombs = [];
 		this.uid = uid;
+		this.keys = {};
 	},
 	appendTo : function(container) {
 		container.appendChild(this.canvas);
@@ -41,14 +42,14 @@ Classify("Game/Player", {
 		});
 	},
 	move : function() {
-		if (this.game.keys.up) {
+		if (this.keys.up) {
 			this.y = Math.max(this.y - (this.game.delta * this.pixelPerMs), 0);
-		} else if (this.game.keys.down) {
+		} else if (this.keys.down) {
 			this.y = Math.min(this.y + (this.game.delta * this.pixelPerMs), this.canvasHeight - this.height);
 		}
-		if (this.game.keys.left) {
+		if (this.keys.left) {
 			this.x = Math.max(this.x - (this.game.delta * this.pixelPerMs), 0);
-		} else if (this.game.keys.right) {
+		} else if (this.keys.right) {
 			this.x = Math.min(this.x + (this.game.delta * this.pixelPerMs), this.canvasWidth - this.width);
 		}
 	},
@@ -59,10 +60,10 @@ Classify("Game/Player", {
 		console.log("Player is dead!");
 	},
 	dropBomb : function() {
-		if (!this.game.keys.space) {
+		if (!this.keys.space) {
 			return;
 		}
-		this.game.keys.space = false;
+		this.keys.space = false;
 		var bomb = new Game.Bomb(this.game, this);
 		this.bombs.push(bomb);
 		this.game.bombs.push(bomb);
