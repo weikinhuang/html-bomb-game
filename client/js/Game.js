@@ -17,10 +17,12 @@ Classify("Game/Game", "FrameTimer", {
 		this.container = document.getElementById("board");
 		this.keys = {};
 		this.player = new Game.Player(this);
+		this.bomb = new Game.Bomb(this);
 		this.bindWindowEvents();
 	},
 	runLoop : function() {
 		this.player.render();
+		this.bomb.render();
 	},
 	setWidth : function(width) {
 		this.canvas.width = width;
