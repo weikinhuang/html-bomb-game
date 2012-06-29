@@ -12,12 +12,21 @@ canvas {
 	-webkit-transform: translateZ(0);
 	transform: translateZ(0);
 }
+#board {
+	position: relative;
+}
+#board canvas {
+	border: 1px solid #000;
+	left: 0;
+	position: absolute;
+	top: 0;
+}
 </style>
 </head>
 <body>
 
-<div id="board"></div>
 <div id="fps">0 fps</div>
+<div id="board"></div>
 
 <script src="js/lab.min.js"></script>
 <script src="js/bootstrap.js"></script>
