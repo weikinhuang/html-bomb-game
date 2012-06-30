@@ -23,7 +23,6 @@ Classify("Game/Player", {
 		}
 		this.move();
 		this.draw();
-		this.shouldDropBomb();
 	},
 	draw : function() {
 		this.$canvas.clearCanvas().drawRect({
@@ -51,23 +50,59 @@ Classify("Game/Player", {
 		this.$canvas.clearCanvas().remove();
 		this.isAlive = false;
 		this.board.players.remove(this);
+		delete this.board.players["u-" + this.uid];
 		console.log("Player " + this.uid + " is dead!");
 	},
 	dropBomb : function() {
-		this.bombActive = true;
-		return this;
-	},
-	shouldDropBomb : function() {
-		if (!this.bombActive) {
-			return;
-		}
-		this.bombActive = false;
 		var bomb = new Game.Bomb(this, this.board);
 		this.bombs.push(bomb);
 		this.board.bombs.push(bomb);
+		return this;
 	},
 	removeBomb : function(bomb) {
 		this.bombs.remove(bomb);
 		this.board.bombs.remove(bomb);
+	},
+	getState : function() {
+		var self = this, keys = {};
+		Object.keys(this.keys).forEach(function(k) {
+			if (self.keys[k]) {
+				keys[k] = true;
+			}
+		});
+		return {
+			keys : keys,
+			isAlive : this.isAlive,
+			bombs : this.bombs.map(function(bomb) {
+				return bomb.getState();
+			}).toArray(),
+			x : this.x,
+			y : this.y
+		};
+	},
+	restoreState : function(state) {
+		if (!state || !this.isAlive) {
+			return;
+		}
+		var self = this;
+		this.x = state.x;
+		this.y = state.y;
+		this.keys = state.keys;
+
+		if (!state.isAlive) {
+			this.remove();
+		}
+
+		state.bombs.forEach(function(bombState) {
+			if (self.bombs.some(function(bomb) {
+				return bombState.dropTime == bomb.dropTime;
+			})) {
+				return;
+			}
+			var bomb = new Game.Bomb(self, self.board);
+			bomb.restoreState(bombState);
+			self.bombs.push(bomb);
+			self.board.bombs.push(bomb);
+		});
 	}
 });

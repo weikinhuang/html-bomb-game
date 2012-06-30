@@ -13,7 +13,6 @@ Classify("Game/Board", {
 		this.players.forEach(function(player) {
 			player.render();
 		});
-
 		this.bombs.forEach(function(bomb) {
 			bomb.render();
 		});
@@ -35,75 +34,90 @@ Classify("Game/Board", {
 		return sessid;
 	},
 	bindEvents : function() {
-		var self = this;
-
 		this.game.socket.emit("init", {
 			sessionId : this.getSessionId()
 		});
 
-		this.game.socket.on("ready", function(data) {
-			console.log("ready", data);
-			self.player = new Game.Player(data.uuid, self);
-			self.players.push(self.player);
-			self.players["u-" + data.uuid] = self.player;
-		});
-
-		this.game.socket.on("playerConnect", function(data) {
-			console.log("playerConnect", data);
-			var player = new Game.Player(data.uuid, self);
-			self.players.push(player);
-			self.players["u-" + data.uuid] = player;
-		});
-
-		this.game.socket.on("playerDisconnect", function(data) {
-			console.log("playerDisconnect", data);
-			self.players.forEach(function(player, i) {
-				if (player.uid == data.uuid) {
-					player.remove();
-				}
-			});
-		});
-		this.game.socket.on("keydown", function(data) {
-			self.players["u-" + data.uuid].keys = data.keys;
-		});
-
-		this.game.socket.on("keyup", function(data) {
-			self.players["u-" + data.uuid].keys = data.keys;
+		this.game.socket.on("ready", this.onPlayerReady);
+		this.game.socket.on("playerConnect", this.onPlayerConnect);
+		this.game.socket.on("playerDisconnect", this.onPlayerDisconnect);
+		this.game.socket.on("stateChange", this.updateState);
+	},
+	__bind_onPlayerReady : function(socket, data) {
+		console.log("ready", data);
+		// keep a reference to the current player
+		this.player = new Game.Player(data.uuid, this);
+		this.players.push(this.player);
+		this.players["u-" + data.uuid] = this.player;
+	},
+	__bind_onPlayerConnect : function(socket, data) {
+		console.log("playerConnect", data);
+		var player = new Game.Player(data.uuid, this);
+		this.players.push(player);
+		this.players["u-" + data.uuid] = player;
+	},
+	__bind_onPlayerDisconnect : function(socket, data) {
+		console.log("playerDisconnect", data);
+		this.players.forEach(function(player, i) {
+			if (player.uid == data.uuid) {
+				player.remove();
+			}
 		});
 	},
-	sendState : function() {
-
+	getState : function() {
+		return {
+			player : this.player.getState()
+		};
 	},
-	__bind_updateState : function() {
-
+	__bind_updateState : function(socket, data) {
+		if (!this.players["u-" + data.uuid] || !data.state) {
+			return;
+		}
+		this.players["u-" + data.uuid].restoreState(data.state.player);
 	},
 	__bind_keyDown : function(context, e) {
 		switch (e.which) {
 			case 38: // up
 			case 87: // w
+				if (this.keys.up) {
+					return;
+				}
 				this.keys.up = true;
 				this.player.keys.up = true;
 				break;
 			case 40: // down
 			case 83: // s
+				if (this.keys.down) {
+					return;
+				}
 				this.keys.down = true;
 				this.player.keys.down = true;
 				break;
 			case 37: // left
 			case 65: // a
+				if (this.keys.left) {
+					return;
+				}
 				this.keys.left = true;
 				this.player.keys.left = true;
 				break;
 			case 39: // right
 			case 68: // d
+				if (this.keys.right) {
+					return;
+				}
 				this.keys.right = true;
 				this.player.keys.right = true;
 				break;
 			case 32: // space
+				if (this.player.bombActive) {
+					return;
+				}
 				this.player.dropBomb();
 				break;
 		}
-		this.game.socket.emit("keydown", this.player.keys);
+		// send the current state when the user does something
+		this.game.socket.emit("stateChange", this.getState());
 	},
 	__bind_keyUp : function(context, e) {
 		switch (e.which) {
@@ -133,6 +147,7 @@ Classify("Game/Board", {
 			default:
 				break;
 		}
-		this.game.socket.emit("keyup", this.keys);
+		// send the current state when the user does something
+		this.game.socket.emit("stateChange", this.getState());
 	}
 });

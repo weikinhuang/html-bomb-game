@@ -111,5 +111,19 @@ Classify("Game/Bomb", {
 		var collideY = (y >= this.y && y <= (this.y + this.height)) || ((y + w) > this.y && (y + w) <= (this.y + this.height));
 
 		return collideX && collideY;
+	},
+	getState : function() {
+		return {
+			dropTime : this.dropTime,
+			centerX : this.centerX,
+			centerY : this.centerY
+		};
+	},
+	restoreState : function(state) {
+		this.dropTime = state.dropTime;
+		this.centerX = state.centerX;
+		this.centerY = state.centerY;
+		this.x = this.centerX - Math.round(this.unExplodedWidth / 2);
+		this.y = this.centerY - Math.round(this.unExplodedHeight / 2);
 	}
 });

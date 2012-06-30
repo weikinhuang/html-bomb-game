@@ -99,39 +99,23 @@ var Server = Classify.create({
 					});
 				});
 
-				socket.on("keyup", function(data) {
-					console.log("keyup: " + currentId);
+				// event for changes to the player state
+				socket.on("stateChange", function(data) {
+					console.log("stateChange: " + currentId);
 					if (!socket.isActive) {
 						return;
 					}
 					var emit_data = {
 						uuid : currentId,
-						keys : data
+						state : data
 					};
 					sockets.forEach(function(s) {
+						// don't emit to self
 						if (s === socket) {
 							return;
 						}
-						s.emit("keyup", emit_data);
+						s.emit("stateChange", emit_data);
 					});
-				});
-
-				socket.on("keydown", function(data) {
-					console.log("keydown: " + currentId);
-					if (!socket.isActive) {
-						return;
-					}
-					var emit_data = {
-						uuid : currentId,
-						keys : data
-					};
-					sockets.forEach(function(s) {
-						if (s === socket) {
-							return;
-						}
-						s.emit("keyup", emit_data);
-					});
-
 				});
 
 				sockets.forEach(function(s) {
