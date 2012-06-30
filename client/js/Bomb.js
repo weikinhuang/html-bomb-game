@@ -26,7 +26,9 @@ Classify("Game/Bomb", {
 		this.canvas.width = board.width;
 		this.$canvas = $(this.canvas).addClass("bomb");
 		board.container.appendChild(this.canvas);
-		this.dropTime = new Date().getTime();
+		var time = new Date().getTime();
+		this.dropTime = time;
+		this.bid = time;
 		this.setInitialPosition();
 		this.redraw = true;
 		this.width = this.unExplodedWidth;
@@ -114,13 +116,14 @@ Classify("Game/Bomb", {
 	},
 	getState : function() {
 		return {
+			bid : this.bid,
 			dropTime : this.dropTime,
 			centerX : this.centerX,
 			centerY : this.centerY
 		};
 	},
 	restoreState : function(state) {
-		this.dropTime = state.dropTime;
+		this.bid = state.bid;
 		this.centerX = state.centerX;
 		this.centerY = state.centerY;
 		this.x = this.centerX - Math.round(this.unExplodedWidth / 2);

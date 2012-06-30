@@ -95,7 +95,7 @@ Classify("Game/Player", {
 
 		state.bombs.forEach(function(bombState) {
 			if (self.bombs.some(function(bomb) {
-				return bombState.dropTime == bomb.dropTime;
+				return bombState.bid == bomb.bid;
 			})) {
 				return;
 			}
