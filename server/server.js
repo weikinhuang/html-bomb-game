@@ -86,7 +86,8 @@ var Server = Classify.create({
 				sessions[data.sessionId] = socket;
 				sockets.push(socket);
 				socket.emit("ready", {
-					uuid : currentId
+					uuid : currentId,
+					position : data.position
 				});
 
 				socket.on("disconnect", function() {
@@ -124,7 +125,8 @@ var Server = Classify.create({
 					}
 					// tell all other players that this player has connected
 					s.emit("playerConnect", {
-						uuid : currentId
+						uuid : currentId,
+						position : data.position
 					});
 
 					// tell current player about the currently connected players

@@ -35,7 +35,11 @@ Classify("Game/Board", {
 	},
 	bindEvents : function() {
 		this.game.socket.emit("init", {
-			sessionId : this.getSessionId()
+			sessionId : this.getSessionId(),
+			position : {
+				x : Math.floor(Math.random() * this.width - 40) + 20,
+				y : Math.floor(Math.random() * this.height - 40) + 20
+			}
 		});
 
 		this.game.socket.on("ready", this.onPlayerReady);
@@ -47,14 +51,22 @@ Classify("Game/Board", {
 		console.log("ready", data);
 		// keep a reference to the current player
 		this.player = new Game.Player(data.uuid, this);
+		this.player.x = data.position.x;
+		this.player.y = data.position.y;
 		this.players.push(this.player);
 		this.players["u-" + data.uuid] = this.player;
 	},
 	__bind_onPlayerConnect : function(socket, data) {
 		console.log("playerConnect", data);
 		var player = new Game.Player(data.uuid, this);
+		if(data.position) {
+			player.x = data.position.x;
+			player.y = data.position.y;
+		}
 		this.players.push(player);
 		this.players["u-" + data.uuid] = player;
+		// alert the everyone of this user's current state when a new player joins
+		this.game.socket.emit("stateChange", this.getState());
 	},
 	__bind_onPlayerDisconnect : function(socket, data) {
 		console.log("playerDisconnect", data);
